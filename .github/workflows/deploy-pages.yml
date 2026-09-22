@@ -28,6 +28,13 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - name: Prefix static asset paths for the project Pages URL
+        run: >-
+          find out -type f \( -name '*.html' -o -name '*.css' -o -name '*.js' -o -name '*.txt' \)
+          -print0 | xargs -0 sed -i
+          's#"/assets/#"/thunder-hackathon/assets/#g;
+          s#"/_next/#"/thunder-hackathon/_next/#g;
+          s#"/icon.svg#"/thunder-hackathon/icon.svg#g'
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
