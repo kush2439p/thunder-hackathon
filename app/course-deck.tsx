@@ -1,6 +1,7 @@
 "use client";
+
 import Image from "next/image";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { courses, site } from "./content";
 
 const details = [
@@ -12,70 +13,29 @@ const details = [
 ];
 
 export function CourseDeck() {
-  const [selected, setSelected] = useState<number | null>(null);
-  const dialog = useRef<HTMLDialogElement>(null);
-  const origin = useRef<DOMRect | null>(null);
-  const lastTrigger = useRef<HTMLElement | null>(null);
-  useLayoutEffect(() => {
-    if (selected === null || !dialog.current) return;
-    const element = dialog.current;
-    element.showModal();
-    if (origin.current && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const from = origin.current, to = element.getBoundingClientRect();
-      const animation = element.animate([
-        { transformOrigin: "top left", transform: `translate(${from.x - to.x}px,${from.y - to.y}px) scale(${from.width / to.width},${from.height / to.height})`, opacity: .4 },
-        { transformOrigin: "top left", transform: "none", opacity: 1 },
-      ], { duration: 520, easing: "cubic-bezier(.16,1,.3,1)" });
-      return () => animation.cancel();
-    }
-  }, [selected]);
-  const open = (index: number, target: HTMLButtonElement) => {
-    origin.current = target.closest("article")!.getBoundingClientRect();
-    lastTrigger.current = target;
-    setSelected(index);
-  };
-  const close = () => {
-    dialog.current?.close();
-    setSelected(null);
-    lastTrigger.current?.focus({ preventScroll: true });
-  };
-  const course = selected === null ? null : courses[selected];
-  const detail = selected === null ? null : details[selected];
-  return <>
-    <div className="course-deck">
-      {courses.map((course, index) => <article key={course.slug} className={`course-tile ${index < 2 ? "course-tile-featured" : ""}`} data-reveal>
-        <div className="course-surface">
-          <div className="course-art">
-            <Image src={`/assets/${course.image}.webp`} alt={course.description} width={1000} height={563} sizes={index < 2 ? "(max-width: 767px) 100vw, 50vw" : "(max-width: 767px) 100vw, 33vw"} />
-          </div>
-          <div className="course-sheet">
-            <div className="course-sheet-meta"><span>{details[index].name}</span><span>{course.duration}</span></div>
-            <h3>{details[index].title}</h3>
-            <div className="course-discovery">
-              <p>{details[index].summary}</p>
-              <ul aria-label="Topics">{details[index].topics.map(topic => <li key={topic}>{topic}</li>)}</ul>
-            </div>
-            <div className="course-actions">
-              <button onClick={event => open(index, event.currentTarget)} aria-haspopup="dialog" aria-label={`Preview ${details[index].name}`}>Quick look <span aria-hidden="true">↗</span></button>
-              <a href={`${site}/course/${course.slug}`} aria-label={`Explore ${details[index].name}`}>Explore course <span aria-hidden="true">→</span></a>
-            </div>
-          </div>
-        </div>
-      </article>)}
-    </div>
-    <dialog ref={dialog} className="course-preview" aria-labelledby="course-preview-title" onCancel={close} onClick={event => { if (event.target === event.currentTarget) close(); }}>
-      {course && detail && <div className="course-preview-body">
-        <button className="course-preview-close" onClick={close} aria-label="Close course preview" autoFocus>×</button>
-        <Image src={`/assets/${course.image}.webp`} alt={course.description} width={1000} height={563} sizes="(max-width: 767px) 90vw, 720px" />
-        <div className="course-preview-copy">
-          <p className="course-sheet-meta">{detail.name} · {course.duration}</p>
-          <h2 id="course-preview-title">{course.title}</h2>
-          <p>{detail.summary}</p>
-          <ul>{detail.topics.map(topic => <li key={topic}>{topic}</li>)}</ul>
-          <a className="course-preview-link" href={`${site}/course/${course.slug}`}>Explore this course on STRIKE <span aria-hidden="true">↗</span></a>
-        </div>
-      </div>}
-    </dialog>
-  </>;
-}
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const toggle = (index: number) => setFlipped(current => current.includes(index) ? current.filter(item => item !== index) : [...current, index]);
 
+  return <div className="course-deck">
+    {courses.map((course, index) => {
+      const detail = details[index];
+      const isFlipped = flipped.includes(index);
+      return <article key={course.slug} className={`course-tile ${index < 2 ? "course-tile-featured" : ""} ${isFlipped ? "is-flipped" : ""}`} data-reveal>
+        <div className="course-surface">
+          <div className="course-flip-inner">
+            <div className="course-card-face course-card-front" role="button" tabIndex={0} aria-label={`Show details for ${detail.name}`} onClick={() => toggle(index)} onKeyDown={event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); toggle(index); } }}>
+              <div className="course-art"><Image src={`/assets/${course.image}.webp`} alt={course.description} width={1000} height={563} sizes={index < 2 ? "(max-width: 767px) 100vw, 50vw" : "(max-width: 767px) 100vw, 33vw"} /></div>
+              <div className="course-front-copy"><span>{course.tag}</span><strong>{detail.name}</strong><small>Tap to turn over <i aria-hidden="true">↗</i></small></div>
+            </div>
+            <div className="course-card-face course-card-back">
+              <div className="course-back-heading"><span>{course.duration}</span><button type="button" onClick={() => toggle(index)} aria-label={`Show ${detail.name} cover`}>Turn back <i aria-hidden="true">↶</i></button></div>
+              <h3>{detail.title}</h3><p>{detail.summary}</p>
+              <ul aria-label="Topics">{detail.topics.map(topic => <li key={topic}>{topic}</li>)}</ul>
+              <div className="course-price-row"><span>Current price</span><a href={`${site}/course/${course.slug}`}>View on STRIKE <i aria-hidden="true">↗</i></a></div>
+            </div>
+          </div>
+        </div>
+      </article>;
+    })}
+  </div>;
+}

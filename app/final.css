@@ -96,7 +96,7 @@ h2 span, .faang h2 span { color: #bcbcc5; }
 .company-selection a { font-size:13px; padding:12px 0; white-space:nowrap; }
 .orbit-pause { background:none; font-size:11px; color:#bdbdc8; padding:12px 0; text-decoration:underline; text-underline-offset:4px; }
 .company-choice:hover,.company-choice:focus-visible { border-color:#f5f5ff; }
-.company-explorer[data-paused="true"] *, .company-explorer:hover *, .company-explorer:focus-within * { animation-play-state:paused !important; }
+.company-explorer[data-paused="true"] * { animation-play-state:paused !important; }
 @media(prefers-reduced-motion:no-preference) {
  .orbit-running .constellation-field i { animation:signal-orbit 26s linear infinite; }
  .orbit-running .constellation-field i:nth-child(2) { animation-direction:reverse; animation-duration:18s; }
@@ -198,3 +198,20 @@ h2 span, .faang h2 span { color: #bcbcc5; }
  .join-button { transition:none; }
  .sale-welcome-card,.sale-welcome-envelope i,.sale-welcome-envelope em,.sale-welcome-seal { animation:none; transition:none; }
 }
+
+/* Benefit illustrations and company constellation stay quietly alive after reveal. */
+@media(prefers-reduced-motion:no-preference) {
+ .benefit-interview img { animation:interview-drift 7s ease-in-out infinite alternate; transform-origin:center bottom; }
+ .benefit-ai .ai-orbit { animation:ai-orbit-spin 18s linear infinite; }
+ .benefit-project .project-symbol { animation:project-breathe 4.5s ease-in-out infinite; }
+ .benefit-progress .progress-bars { animation:progress-settle 5s ease-in-out infinite alternate; transform-origin:bottom; }
+ .benefit-grid > article:hover .benefit-interview img { animation-play-state:paused; transform:translate(-8px,-7px) scale(1.045); }
+ .benefit-grid > article:hover .ai-orbit { animation-duration:5s; }
+ .benefit-grid > article:hover .project-symbol { transform:rotate(-4deg) scale(1.08); }
+ .company-choice:hover img,.company-choice:focus-visible img { filter:grayscale(0); transform:scale(1.08); }
+ .company-choice img { transition:filter .25s ease,transform .25s ease; }
+}
+@keyframes interview-drift { from { transform:translate3d(0,0,0); } to { transform:translate3d(-12px,-9px,0); } }
+@keyframes ai-orbit-spin { to { transform:rotate(360deg); } }
+@keyframes project-breathe { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px) scale(1.035); } }
+@keyframes progress-settle { from { transform:scaleY(.94); } to { transform:scaleY(1); } }

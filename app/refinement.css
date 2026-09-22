@@ -42,8 +42,9 @@
   padding: 155px 24px 115px;
   justify-content: center;
   align-items: center;
-  background: #0c0d0e;
+  background: radial-gradient(ellipse at 50% 26%, #151515 0%, #0a0a0a 54%, #070707 100%);
 }
+.hero-art { opacity: .22; mix-blend-mode: screen; }
 .hero-stage:after {
   background: linear-gradient(0deg, #070708, transparent 60%);
 }
