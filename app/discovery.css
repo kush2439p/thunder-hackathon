@@ -1,0 +1,115 @@
+/* Course discovery and reward reveal. Motion uses transform and opacity;
+   native dialog supplies focus containment, Escape and an inert background. */
+html { scroll-padding-top: 110px; }
+.course-deck { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:26px; }
+.course-tile { grid-column:span 2; min-width:0; }
+.course-tile-featured { grid-column:span 3; }
+.course-surface { position:relative; height:480px; border:1px solid #424248; border-radius:20px; overflow:hidden; background:#171719; isolation:isolate; transition:transform .55s cubic-bezier(.16,1,.3,1); }
+.course-art { position:absolute; inset:0 0 auto; height:60%; overflow:hidden; background:#131315; transform-origin:top center; transition:transform .65s cubic-bezier(.16,1,.3,1); }
+.course-art img { width:100%; height:100%; object-fit:contain; }
+.course-sheet { position:absolute; inset:auto 0 0; min-height:315px; padding:27px 24px 20px; background:linear-gradient(160deg,#29292e,#161618 70%); border-top:1px solid #585862; border-radius:24px 24px 0 0; transform:translateY(0); transition:transform .65s cubic-bezier(.16,1,.3,1); display:flex; flex-direction:column; }
+.course-sheet-meta { display:flex; justify-content:space-between; gap:12px; font:11px/1.5 Manrope,Arial,sans-serif; color:#c4c4cb; }
+.course-sheet-meta span:last-child { flex-shrink:0; color:#aeb0bc; }
+.course-sheet h3 { font:600 clamp(23px,2vw,30px)/1.2 Manrope,Arial,sans-serif; letter-spacing:-.8px; margin:13px 0 16px; max-width:18ch; color:#f4f4f7; min-height:2.4em; }
+.course-discovery { transition:transform .45s ease,opacity .35s ease; }
+.course-discovery p { font:13px/1.65 Manrope,Arial,sans-serif; color:#c2c2cd; max-width:45ch; }
+.course-discovery ul,.course-preview-copy ul { list-style:none; display:flex; flex-wrap:wrap; gap:7px; margin:15px 0 20px; padding:0; }
+.course-discovery li,.course-preview-copy li { border:1px solid #53535e; border-radius:5px; padding:5px 8px; font:11px/1.4 Manrope,Arial,sans-serif; color:#dbdbe4; }
+.course-actions { display:flex; align-items:center; gap:12px; justify-content:space-between; margin-top:auto; }
+.course-actions button,.course-actions a { min-height:44px; display:inline-flex; align-items:center; justify-content:space-between; gap:12px; font:12px Manrope,Arial,sans-serif; }
+.course-actions button { background:#e3e3e9; border:1px solid #fff3; color:#151519; border-radius:8px; padding:10px 13px; overflow:hidden; }
+.course-actions a { color:#dedee5; }
+.course-actions span,.course-preview-link span { display:inline-block; transition:transform .35s cubic-bezier(.16,1,.3,1); }
+.course-actions :is(a,button):hover span { transform:translate(3px,-3px); }
+.course-actions :is(a,button):focus-visible,.course-preview :is(a,button):focus-visible { outline:2px solid #f0f0f5; outline-offset:4px; }
+.course-preview { width:min(720px,calc(100% - 32px)); max-height:88dvh; padding:0; border:1px solid #5c5c68; border-radius:20px; background:#19191d; color:#eeeef5; overflow:auto; margin:auto; }
+.course-preview::backdrop,.reward-dialog::backdrop { background:#07070bd9; }
+.course-preview-body { position:relative; }
+.course-preview-body > img { width:100%; height:auto; max-height:38dvh; object-fit:contain; background:#0e0e10; }
+.course-preview-close,.reward-close { position:absolute; top:14px; right:14px; z-index:5; width:44px; height:44px; border:1px solid #74747d; border-radius:50%; color:#f6f6fa; background:#202026; font:26px Arial,sans-serif; }
+.course-preview-copy { padding:28px 32px 32px; }
+.course-preview-copy h2 { font:600 clamp(24px,4vw,34px)/1.2 Manrope,Arial,sans-serif; letter-spacing:-.7px; margin:15px 0; }
+.course-preview-copy > p { color:#bfbfc9; line-height:1.7; }
+.course-preview-link { display:flex; justify-content:space-between; gap:15px; padding:16px; border-radius:8px; background:#e2e2e9; color:#18181c; font:600 14px Manrope,Arial,sans-serif; }
+@media(hover:hover) and (pointer:fine) and (min-width:1024px) {
+ .course-surface { height:465px; }
+ .course-tile-featured .course-surface { height:490px; }
+ .course-art { height:66%; }
+ .course-sheet { transform:translateY(117px); }
+ .course-discovery { opacity:0; transform:translateY(18px); }
+ .course-actions { transform:translateY(-110px); transition:transform .65s cubic-bezier(.16,1,.3,1); }
+ .course-tile:is(:hover,:focus-within) { position:relative; z-index:2; }
+ .course-tile:is(:hover,:focus-within) .course-surface { transform:translateY(-7px) scale(1.025); }
+ .course-tile:is(:hover,:focus-within) .course-art { transform:scale(.86) translateY(-20px); }
+ .course-tile:is(:hover,:focus-within) .course-sheet,.course-tile:is(:hover,:focus-within) .course-actions { transform:translateY(0); }
+ .course-tile:is(:hover,:focus-within) .course-discovery { opacity:1; transform:translateY(0); }
+}
+@media(max-width:1023px) {
+ .course-deck { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
+ .course-tile,.course-tile-featured { grid-column:auto; }
+ .course-tile:last-child { grid-column:1/-1; }
+ .course-surface { height:auto; }
+ .course-art { position:relative; height:auto; aspect-ratio:16/9; }
+ .course-sheet { position:relative; min-height:320px; margin-top:-15px; }
+}
+@media(max-width:600px) {
+ .course-deck { grid-template-columns:minmax(0,1fr); gap:24px; }
+ .course-sheet { min-height:0; padding:24px 20px 20px; }
+ .course-sheet h3 { min-height:0; font-size:27px; }
+ .course-preview-copy { padding:24px 20px; }
+}
+/* One shared reward, from sealed letter to coupon to checkout. */
+.reward-dialog { width:min(480px,calc(100% - 28px)); max-height:92dvh; padding:0; margin:auto; border:1px solid #62626c; border-radius:22px; overflow:auto; background:#17171b; color:#f4f4f8; }
+.reward-paper { position:relative; padding:34px 32px 20px; text-align:center; background:radial-gradient(ellipse at 50% 25%,#35353f,#17171b 65%); }
+.reward-label { font:10px/1.6 Manrope,Arial,sans-serif; letter-spacing:.16em; color:#b9bac5; padding-right:20px; }
+.reward-envelope { position:relative; width:234px; height:143px; margin:65px auto 24px; perspective:850px; }
+.reward-letter { position:absolute; inset:10px 14px; border-radius:7px; background:linear-gradient(140deg,#e7e9dd,#b1c0a5); color:#25301f; display:flex; align-items:center; justify-content:center; flex-direction:column; transition:transform .7s cubic-bezier(.16,1,.3,1) .2s; }
+.reward-letter strong { font:50px/1.1 Audiowide,Arial,sans-serif; }
+.reward-letter span { font:8px Manrope,Arial,sans-serif; letter-spacing:.12em; margin-top:6px; }
+.reward-fold { position:absolute; inset:0; border:1px solid #7d7d87; border-radius:9px; background:linear-gradient(30deg,#37373e,#222229); clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%); z-index:2; }
+.reward-flap { position:absolute; inset:0; border-radius:9px; background:linear-gradient(#65656f,#393942); clip-path:polygon(0 0,100% 0,50% 57%); transform-origin:top; transition:transform .65s cubic-bezier(.16,1,.3,1); z-index:3; backface-visibility:hidden; }
+.reward-seal { position:absolute; top:55px; left:calc(50% - 24px); width:48px; height:48px; display:grid; place-items:center; border-radius:50%; background:linear-gradient(130deg,#e4f2ce,#92a979); color:#283321; border:3px double #718659; z-index:4; font:22px Audiowide,Arial,sans-serif; transition:transform .4s ease,opacity .3s ease; }
+.reward-paper:is([data-opening="true"],[data-unlocked="true"]) .reward-flap { transform:rotateX(175deg); }
+.reward-paper:is([data-opening="true"],[data-unlocked="true"]) .reward-seal { transform:scale(.4) rotate(80deg); opacity:0; }
+.reward-paper:is([data-opening="true"],[data-unlocked="true"]) .reward-letter { transform:translateY(-56px); }
+.reward-paper h2 { font:600 clamp(27px,4vw,36px)/1.15 Manrope,Arial,sans-serif; letter-spacing:-1px; margin:20px 0 12px; }
+.reward-paper h2 span { color:#c4d9ac; }
+.reward-description { font:14px/1.65 Manrope,Arial,sans-serif; color:#c5c5ce; max-width:36ch; margin:0 auto 20px; }
+.reward-primary { display:flex; justify-content:space-between; align-items:center; gap:15px; width:100%; min-height:50px; padding:13px 18px; border:1px solid #d7e8c3; border-radius:9px; background:#c4d9ac; color:#222c1b; font:700 14px Manrope,Arial,sans-serif; }
+.reward-primary span:last-child { transition:transform .3s ease; }
+.reward-primary:hover span:last-child { transform:translate(3px,-3px); }
+.reward-primary:disabled { background:#42454a; color:#dedee5; border-color:#737580; cursor:default; }
+.reward-later { min-height:44px; padding:12px; background:none; color:#d0d0db; font-size:12px; }
+.reward-demo { display:block; font-size:10px; color:#aaaab8; line-height:1.5; }
+.reward-voucher { padding:16px; border:1px solid #5a5d59; border-radius:10px; margin:0 0 18px; text-align:left; background:#151619; }
+.reward-voucher > div { display:flex; justify-content:space-between; align-items:center; gap:14px; }
+.reward-voucher > div + div { border-top:1px dashed #535650; margin-top:13px; padding-top:13px; }
+.reward-voucher small { font-size:9px; color:#b7b9b4; }
+.reward-voucher time { font:18px monospace; font-variant-numeric:tabular-nums; color:#d8e4c9; }
+.reward-voucher code { color:#f5f5f7; font-size:18px; user-select:all; }
+.reward-voucher button { background:#30352b; color:#e0ead3; border:1px solid #657359; padding:10px; border-radius:6px; min-height:44px; }
+.reward-voucher button:disabled { opacity:.55; }
+.reward-dialog button:focus-visible { outline:2px solid #f1f5ed; outline-offset:3px; }
+.reward-dock { position:fixed; z-index:35; bottom:20px; right:20px; display:flex; gap:12px; align-items:center; width:min(440px,calc(100% - 28px)); padding:14px; border:1px solid #676771; border-radius:14px; background:#202025f7; color:#f2f2f7; box-shadow:0 8px 30px #0006; }
+.reward-dock-mark { flex-shrink:0; width:45px; height:48px; display:grid; place-items:center; border:1px solid #849174; border-radius:8px; font:14px Audiowide,Arial,sans-serif; color:#c4d9ac; background:#30352d; }
+.reward-dock > div { flex:1; min-width:0; display:grid; gap:5px; }
+.reward-dock strong { font:600 12px/1.4 Manrope,Arial,sans-serif; }
+.reward-dock small { color:#b5b5c2; font-size:10px; }
+.reward-dock time { font:13px monospace; color:#d2dfc3; }
+.reward-dock-open { min-height:44px; padding:10px 12px; border:1px solid #676771; border-radius:7px; background:#38383f; color:#f5f5f8; font-size:12px; }
+.reward-dock-dismiss { flex-shrink:0; width:28px; min-height:44px; color:#dddde8; background:none; font-size:20px; }
+.reward-reopen { position:fixed; z-index:35; bottom:20px; right:20px; padding:12px 18px; min-height:44px; background:#26262d; border:1px solid #72727d; color:#e3ecd9; border-radius:9px; font-size:12px; }
+body:has(dialog[open]) { overflow:hidden; }
+body:has(#courses:target) .reward-dock { opacity:.95; }
+@media(max-width:600px) {
+ .reward-paper { padding:30px 22px 18px; }
+ .reward-label { font-size:9px; text-align:left; }
+ .reward-envelope { margin-top:60px; transform:scale(.9); margin-bottom:12px; }
+ .reward-dock { bottom:10px; right:14px; gap:8px; padding:10px; }
+ .reward-dock-mark { width:36px; height:40px; font-size:12px; }
+}
+@media(prefers-reduced-motion:reduce) {
+ html { scroll-behavior:auto !important; }
+ .course-surface,.course-art,.course-sheet,.course-discovery,.course-actions,.course-actions span,.reward-letter,.reward-flap,.reward-seal,.reward-primary span { transition:none !important; animation:none !important; }
+}
+
