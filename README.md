@@ -2,6 +2,10 @@
 
 A static, frontend-only STRIKE homepage recreation for Thunder Hackathon 6.0.
 
+## Live preview
+
+[Open the public preview](https://kush2439p.github.io/thunder-hackathon/)
+
 ## Run
 
 Requires Node.js 20.9+ and pnpm.
@@ -97,7 +101,7 @@ The countdown is client-side and cannot provide tamper-resistant redemption. Cle
 The reference site's displayed membership prices differ from its checkout query parameters. This recreation uses its observed displayed prices and does not submit purchases.
 The static page remains readable without JavaScript, but coupon, menu and checkout interactions require JavaScript. External pages need internet access.
 Individual-letter wrapping increases DOM size. The delegated motion system avoids per-letter event listeners, but real-device performance should still be tested. V4 removed the earlier Spline enhancement from the rendered page.
-A public deployment, public GitHub repository/commit history and narrated demo video are still submission steps, not created or published by this local rebuild.
+The public GitHub repository and GitHub Pages preview are published. A narrated demo video remains the final submission asset to record.
 
 ## Suggested 90-second demo
 
